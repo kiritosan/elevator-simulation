@@ -1,28 +1,30 @@
 #include "Elevator.h"
 #include <iostream>
 #include "Building.h"
-
 using namespace std;
 
 // 实现电梯类的构造函数
-Elevator::Elevator(int id, int max_capacity, int speed)
-{
-	this->id = id;
-	this->max_capacity = max_capacity;
-    this->speed = speed;
-	current_floor = rand() % 40 + 1; // 随机设置当前楼层
-	direction = 0;
-
-	cout << "Elevator：" << id << "已生成" << endl;
-	cout << "电梯初始楼层为：" << current_floor << endl;
-    cout << "电梯运行状态为：" << direction << endl;
-    cout << "电梯最大载客量为：" << max_capacity << endl;
-    cout << "电梯运行速度为：" << speed << endl;
+Elevator::Elevator(int id, int max_capacity) {
+    this->id = id; // 设置电梯编号
+    this->max_capacity = max_capacity; // 设置最大载客量
+    this->current_floor = rand() % Building::floors + 1; // 随机设置当前楼层
+    this->direction = 0; // 初始运行方向为停止
 }
 
-// 实现电梯的移动函数
-void Elevator::move()
-{
+// 实现电梯类的移动函数
+void Elevator::move() {
+    if (direction == 1) { // 如果运行方向为上行
+        current_floor++; // 当前楼层加一
+        cout << "电梯" << id << "上升到" << current_floor << "层。" << endl;
+    }
+    else if (direction == -1) { // 如果运行方向为下行
+        current_floor--; // 当前楼层减一
+        cout << "电梯" << id << "下降到" << current_floor << "层。" << endl;
+    }
+}
+
+// 实现电梯类的移动函数
+void Elevator::move() {
     // 如果请求列表为空，则停止运行
     if (request_list.empty()) {
         direction = 0;
@@ -39,11 +41,23 @@ void Elevator::move()
     // 根据运行方向移动一层
     if (direction == 1) {
         current_floor++;
-        cout << "Elevator:" << id << "向上移动到了第" << current_floor << "层" << endl;
     }
     else if (direction == -1) {
         current_floor--;
-        cout << "Elevator:" << id << "向下移动到了第" << current_floor << "层" << endl;
+    }
+}
+
+// 实现电梯类的关闭电梯门函数
+void Elevator::close() {
+    cout << "电梯" << id << "在" << current_floor << "层关门。" << endl;
+    // 根据当前楼层和请求列表更新运行方向
+    if (!request_list.empty()) {
+        if (request_list.front() > current_floor) {
+            direction = 1; // 设置运行方向为上行
+        }
+        else if (request_list.front() < current_floor) {
+            direction = -1; // 设置运行方向为下行
+        }
     }
 }
 
@@ -88,3 +102,20 @@ void Elevator::unload(Passenger p) {
         }
     }
 }
+
+// 实现电梯类的添加请求函数
+void Elevator::add_request(int floor) {
+    cout << "电梯" << id << "收到了来自" << floor << "层的请求。" << endl;
+    // 将该楼层加入请求列表
+    request_list.push_back(floor);
+    // 根据当前楼层和请求楼层更新电梯运行方向
+    if (floor > current_floor) {
+        direction = 1; // 设置运行方向为上行
+    }
+    else if (floor < current_floor) {
+        direction = -1; // 设置运行方向为下行
+    }
+}
+
+
+
